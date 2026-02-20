@@ -1,0 +1,91 @@
+scalar Date
+
+enum RoomType {
+  STANDARD
+  DELUXE
+  SUITE
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+type Hotel {
+  id: ID!
+  name: String!
+  address: String!
+  starRating: Int!
+  imageUrl: String
+  rooms: [Room!]!
+  createdAt: String!
+}
+
+type Room {
+  id: ID!
+  number: String!
+  type: RoomType!
+  pricePerNight: Float!
+  capacity: Int!
+  description: String
+  hotel: Hotel!
+  bookings(status: BookingStatus): [Booking!]!
+}
+
+type Booking {
+  id: ID!
+  room: Room!
+  guestName: String!
+  guestEmail: String
+  checkIn: Date!
+  checkOut: Date!
+  status: BookingStatus!
+  createdAt: String!
+}
+
+type AvailabilityResult {
+  available: Boolean!
+  conflictingBookings: [Booking!]!
+}
+
+type BookingResult {
+  success: Boolean!
+  booking: Booking
+  message: String!
+}
+
+input CheckAvailabilityInput {
+  roomId: ID!
+  checkIn: Date!
+  checkOut: Date!
+}
+
+input CreateBookingInput {
+  roomId: ID!
+  checkIn: Date!
+  checkOut: Date!
+  guestName: String!
+  guestEmail: String
+}
+
+input CancelBookingInput {
+  bookingId: ID!
+}
+
+type Query {
+  hotels: [Hotel!]!
+  hotel(id: ID!): Hotel
+  rooms(hotelId: ID!): [Room!]!
+  room(id: ID!): Room
+  bookings(roomId: ID!, status: BookingStatus): [Booking!]!
+  checkAvailability(input: CheckAvailabilityInput!): AvailabilityResult!
+}
+
+type Mutation {
+  createBooking(input: CreateBookingInput!): BookingResult!
+  cancelBooking(input: CancelBookingInput!): BookingResult!
+}
+
+type Subscription {
+  bookingChanged(roomId: ID): Booking!
+}
